@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tabular data representaion</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <!-- csv file from https://data.giss.nasa.gov/gistemp/ -->
+
+    <button class="btn" onclick="changeState()">ChangeState</button>
+
+    <canvas id="myChart" width="800px" height="500px"></canvas>
+    <script>
+      var myChart = new Chart(document.getElementById("myChart"), {});
+
+      let state = "line";
+      //changing the state (graph type)
+      const changeState = () => {
+        if (state == "line") {
+          state = "bar";
+          chartTemp(state);
+        } else {
+          state = "line";
+          chartTemp(state);
+        }
+      };
+
+      
+      //function fetches the csv data and puts into chart object
+      const chartTemp = async (type) => {
+        const zonal = await fetchCSVFile("zonaltemp.csv");
+        const northdata = await fetchCSVFile("northdata.csv");
+        const southdata = await fetchCSVFile("southdata.csv");
+        const graphdata = {
+          labels: zonal.xs,
+          datasets: [
+            {
+              label: "Zonal",
+              data: zonal.ys,
+              borderColor: "#1D1CE5",
+              backgroundColor: "#1D1CE5",
+              borderWidth: 2,
+
+              pointRadius: 1,
+            },
+            {
+              label: "North data",
+              data: northdata.ys,
+              type: "line",
+              borderColor: "#7978FF",
+              backgroundColor: "#7978FF",
+              pointRadius: 1,
+              borderWidth: 2,
+            },
+            {
+              label: "South data",
+              data: southdata.ys,
+              type: "line",
+              borderColor: "#971549",
+              backgroundColor: "#971549",
+              pointRadius: 1,
+              borderWidth: 2,
+            },
+          ],
+        };
+        const config = {
+          type: type,
+          data: graphdata,
+          options: {
+            scales: {
+              y: {
+                ticks: {
+                  // Include a dollar sign in the ticks
+                  callback: function (value, index, ticks) {
+                    return (
+                      Chart.Ticks.formatters.numeric.apply(this, [
+                        value,
+                        index,
+                        ticks,
+                      ]) + "°"
+                    );
+                  },
+                },
+              },
+            },
+          },
+        };
+        myChart.destroy();
+        myChart = new Chart(document.getElementById("myChart"), config);
+      };
+
+
+      //initial state
+      chartTemp(state);
+      //function to fetch and put csv data in the array items
+      async function fetchCSVFile(filename) {
+        var xs = [];
+        var ys = [];
+        const res = await fetch(`csvfile/${filename}`);
+        const data = await res.text();
+        const table = data.split("\n").slice(1);
+        table.map((row) => {
+          const columns = row.split(",");
+          xs.push(columns[0]);
+          ys.push(parseFloat(columns[1]));
+        });
+        return { xs, ys };
+      }
+    </script>
+  </body>
+</html>

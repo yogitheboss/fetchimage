@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fetching images</title>
+  </head>
+  <body>
+    <img src="#" class="img" alt="" />
+    <img src="#" class="img" alt="" />
+    <img src="#" class="img" alt="" />
+    <p class="filecontainer"></p>
+    <p class="filecontainer"></p>
+    <p class="filecontainer"></p>
+    <p class="filecontainer"></p>
+
+
+    <textarea rows="10" cols="30"></textarea>
+    <script>
+        // console.log("I am fetching an vite svg");
+        const images=["svelte.svg","vite.svg","stop.jfif"]
+        images.map((image,index)=>{
+            svgImgFetcher(image,index)
+        })
+      
+
+
+        //fetching images
+          async function svgImgFetcher(link,index){
+          const res=await fetch(`images/${link}`)
+          const blob=await res.blob();
+          document.getElementsByClassName("img")[index].src = URL.createObjectURL(blob);
+        }
+
+        //fetching text files 
+        async function fileFetcher(filename,index){
+            const res=await fetch(`files/${filename}`)
+            const blob=await res.blob();
+            const text=await blob.text();
+            document.getElementsByClassName("filecontainer")[index].innerText = text;
+        }
+        
+        const filenames=['file1.txt','file2.txt','file3.txt'];
+        filenames.map((file,index)=>{
+            fileFetcher(file,index)
+        })
+        //working with session storages:
+        sessionStorage.setItem("yogi","1");
+        console.log(sessionStorage.getItem('yogi'))
+
+     
+    </script>
+  </body>
+</html>

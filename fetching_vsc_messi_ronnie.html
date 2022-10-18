@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MESSI VS RONALDO</title>
+  </head>
+  <body>
+    <canvas id="comparison"></canvas>
+    <script>
+      canvas = document.getElementById("comparison");
+
+      async function getcomparison() {
+        const res = await fetch("csvfile/cristiano_vs_messi.xls");
+        const data = await res.text();
+        const table = data.split("\n").splice(1);
+        var messidata = {
+          type: {
+            freekicks: 0,
+            tapins: 0,
+            Headers: 0,
+            weakfoot: 0,
+            strongfoot: 0,
+            penalty: 0,
+          },
+          goalscount: 0,
+        };
+        var ronaldodata = {
+          type: {
+            freekicks: 0,
+            tapins: 0,
+            Headers: 0,
+            weakfoot: 0,
+            strongfoot: 0,
+            penalty: 0,
+          },
+          goalscount: 0,
+        };
+        table.map((row, index) => {
+          const columns = row.split(",");
+          if (columns[0] == "messi") {
+            if (columns[8] == "Tap-in") {
+              messidata.type.tapins += 1;
+              messidata.goalscount += 1;
+            } else if (columns[8] == "Penalty") {
+              messidata.type.penalty += 1;
+            }
+          }
+          if (columns[0] == "ronaldo") {
+            if (columns[8] == "Tap-in") {
+              ronaldodata.type.tapins += 1;
+              ronaldodata.goalscount += 1;
+            } else if (columns[8] == "Penalty") {
+              ronaldodata.type.penalty += 1;
+            }
+          }
+        });
+        console.log(messidata);
+        console.log(ronaldodata);
+      }
+      getcomparison();
+    </script>
+  </body>
+</html>
