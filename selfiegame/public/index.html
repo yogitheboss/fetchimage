@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico" />
+    <title>Selfier</title>
+  </head>
+  <body>
+    <h1>Selfier app</h1>
+    <h2>your location</h2>
+    <p>longitude: <span id="longi"></span></p>
+    <p>latitude: <span id="lati"></span></p>
+
+    <button id="save">Save location</button>
+
+
+
+    <button id="seeSavedLocation">See locations</button>
+    <script>
+      let count=1
+      const savedLatLon=[]
+      document.getElementById("save").addEventListener("click", () => {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(async (position) => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            document.getElementById("longi").innerText = longitude;
+            document.getElementById("lati").innerText = latitude;
+
+            const data = {
+              latitude,
+              longitude,
+            };
+
+            savedLatLon.push([data.latitude,data.longitude])
+            localStorage.setItem(`location ${count++}`,`latitude: ${ data.latitude} longitude: ${data.longitude}`)
+            
+
+
+            const options = {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            };
+            const res = await fetch("/api", options);
+            const json = await res.json();
+            console.log(json);
+          });
+        } else {
+          console.log("it isn't available");
+        }
+      });
+      document.getElementById('seeSavedLocation').addEventListener('click',()=>{
+        console.log(savedLatLon);
+        console.log(localStorage.key());
+      })
+
+    </script>
+  </body>
+</html>
